@@ -5,11 +5,13 @@
 
 #include <SPI.h>
 
+int pino2=2;
+bool estado_sensor;
 //Variável utilizada para enviar as mensagens utilizando o cliente MQTT
 bool mensagem; 
 
 //Define o endereço MAC que será utilizado
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte mac[] = { 0x00, 0x10, 0xFA, 0x6E, 0x38, 0x4A };
 
 //Inicia o cliente Ethernet
 EthernetClient client;
@@ -43,23 +45,35 @@ void setup() {
     Serial.println("");
 
     //Aguarda 10 segundos
-    delay(5000);  
 }
 
 void loop() {
 
     //Define o nome do cliente MQTT e efetua a conexão com o servidor.
-    mqttClient.connect("lucasjorge");
+    mqttClient.connect("andregeorgio");
 
     /*
       Variável que envia a mensagem e armazena o valor de '1' caso 
       a mensagem seja enviada com sucesso e '0' caso o envio falhe
     */
-    mensagem = mqttClient.publish("ar_condicionado", "LIGADO");
-   
+    
+    Serial.println(mensagem);   
     //Função que verifica a conexão entre o Cliente e o Broker e evita a queda de conexão entre eles.
     mqttClient.loop();
 
     //Aguarda um período de 0,5 segundos
-    delay(500);
+    estado_sensor = digitalRead(pino2);
+    
+    if (estado_sensor==0) {
+  Serial.println("fechado");
+  mensagem = mqttClient.publish("andregeorgio", "fechado");
+  
+}
+
+    if (estado_sensor==1){
+     Serial.println("aberto");
+       mensagem = mqttClient.publish("andregeorgio", "aberto");
+
+  
+}
 }
